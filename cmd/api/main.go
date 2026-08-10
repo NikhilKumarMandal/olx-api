@@ -3,18 +3,30 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 )
 
 func main(){
+	mux := http.NewServeMux()
 
-	http.HandleFunc("GET /healthz", func(w http.ResponseWriter,r  *http.Request){
+	mux.HandleFunc("GET /healthz", func(
+		w http.ResponseWriter,
+		r *http.Request){
 		w.Header().Set("Content-Type","application/json")
+		w.WriteHeader(http.StatusOK)
 
-		w.Write([]byte("all ok"))
+		w.Write([]byte(`{"status":"ok"}`))
 	})
 
-
-	err := http.ListenAndServe(":8090",nil)
+	srv := http.Server{
+		Addr: ":8090",
+		Handler: mux,
+		ReadTimeout: time.Second * 10,
+		WriteTimeout: time.Second * 30,
+		IdleTimeout: time.Second *60,
+	}
+	err := srv.ListenAndServe()
+	
 	if err != nil {
 		log.Fatalf("server failed: %v",err)
 	}
