@@ -7,23 +7,17 @@ import (
 	"time"
 
 	"github.com/NikhilKumarMandal/olx-api/internal/config"
+	"github.com/NikhilKumarMandal/olx-api/internal/handlers"
 )
 
 func main(){
 	cfg := config.MustLoad()
 
 	fmt.Println("starting olx server...")
-	
+
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /healthz", func(
-		w http.ResponseWriter,
-		r *http.Request){
-		w.Header().Set("Content-Type","application/json")
-		w.WriteHeader(http.StatusOK)
-
-		w.Write([]byte(`{"status":"ok"}`))
-	})
+	mux.HandleFunc("GET /healthz", handlers.Health)
 
 	srv := http.Server{
 		Addr: ":" + cfg.Port,
