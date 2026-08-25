@@ -18,8 +18,8 @@ func main(){
 	if err != nil {
 		log.Fatalf("main.db.connect: %v",err)
 	}
+	
 	fmt.Println(("database connected"))
-
 	fmt.Println(("starting olx server..."))
 
 	mux := http.NewServeMux()
