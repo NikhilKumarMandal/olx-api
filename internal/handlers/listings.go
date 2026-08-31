@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -83,7 +84,8 @@ func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		id)
 
 	if err != nil {
-		log.Printf("delete: %v",err)
+		// log.Printf("delete: %v",err)
+		slog.Error("delete failed","listing_id",id,"err",err)
 		http.Error(w,"internal error",http.StatusInternalServerError)
 		return
 	}
