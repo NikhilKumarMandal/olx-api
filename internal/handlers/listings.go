@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/NikhilKumarMandal/olx-api/internal/httpx"
 	"github.com/NikhilKumarMandal/olx-api/internal/middleware"
 )
 type listing struct {
@@ -89,7 +90,8 @@ func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// log.Printf("delete: %v",err)
 		lh.logger.Error("delete failed","listing_id",id,"request_id",requestId,"err",err)
-		http.Error(w,"internal error",http.StatusInternalServerError)
+		//http.Error(w,"internal error",http.StatusInternalServerError)
+		httpx.Error(w,http.StatusInternalServerError,"Something went wrong",httpx.CodeInternalError)
 		return
 	}
 
