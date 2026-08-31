@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/NikhilKumarMandal/olx-api/internal/middleware"
 )
 type listing struct {
 	ID string `json:"id"`
@@ -76,7 +78,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 
 func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
+	requestId := middleware.RequestIdFromContext(ctx)
 	id := r.PathValue("id")
 
 	_,err := lh.db.ExecContext(
@@ -86,7 +88,7 @@ func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// log.Printf("delete: %v",err)
-		lh.logger.Error("delete failed","listing_id",id,"err",err)
+		lh.logger.Error("delete failed","listing_id",id,"request_id",requestId,"err",err)
 		http.Error(w,"internal error",http.StatusInternalServerError)
 		return
 	}
