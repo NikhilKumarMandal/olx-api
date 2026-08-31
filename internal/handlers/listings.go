@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -19,11 +18,13 @@ type listing struct {
 
 type ListingHandler struct {
 	db *sql.DB
+	logger *slog.Logger
 }
 
-func NewListingHandler(db *sql.DB) *ListingHandler {
+func NewListingHandler(db *sql.DB,logger *slog.Logger) *ListingHandler {
 	return &ListingHandler{
 		db:db,
+		logger:logger,
 	}
 }
 
@@ -40,7 +41,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 	`)
 
 	if err != nil {
-		log.Printf("query: %v",err)
+		lh.logger.Error("Listing query error","err",err)
 		http.Error(w, "internal error",http.StatusInternalServerError)
 		return
 	}
@@ -52,7 +53,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var l listing
 		if err := rows.Scan(&l.ID,&l.Title,&l.Description, &l.Price,&l.City,&l.CreatedAt); err != nil {
-			log.Printf("rows.scan: %v",err)
+			lh.logger.Error("rows scan error","err",err)
 			http.Error(w,"internal error",http.StatusInternalServerError)
 			return
 		}
@@ -61,7 +62,7 @@ func (lh ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Printf("rows.err: %v",err)
+		lh.logger.Error("rows error","err",err)
 		http.Error(w,"internal error",http.StatusInternalServerError)	
 		return	
 	}
@@ -85,7 +86,7 @@ func (lh ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// log.Printf("delete: %v",err)
-		slog.Error("delete failed","listing_id",id,"err",err)
+		lh.logger.Error("delete failed","listing_id",id,"err",err)
 		http.Error(w,"internal error",http.StatusInternalServerError)
 		return
 	}
