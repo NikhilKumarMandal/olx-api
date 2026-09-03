@@ -15,6 +15,7 @@ const (
 type errorPlayload struct {
 	Code Code `json:"code"`
 	Message string `json:"message"`
+	Field string `json:"field,omitempty"`
 }
 
 type errorEnvelope struct {
@@ -28,5 +29,16 @@ func Error(w http.ResponseWriter, status int, message string, code Code) {
 	_ = json.NewEncoder(w).Encode(errorEnvelope{Error: errorPlayload{
 		Code: code,
 		Message: message,
+	}})
+}
+
+func ValidationError(w http.ResponseWriter, status int, message string, code Code,field string) {
+	w.Header().Set("Content-Type","application/json")
+	w.WriteHeader(status)
+
+	_ = json.NewEncoder(w).Encode(errorEnvelope{Error: errorPlayload{
+		Code: code,
+		Message: message,
+		Field: field,
 	}})
 }
